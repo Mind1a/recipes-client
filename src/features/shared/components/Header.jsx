@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const Header = () => {
   const baseStyles = "transition-colors";
@@ -8,7 +8,9 @@ const Header = () => {
   return (
     <header className="bg-gray-900 text-white px-6 py-4 shadow-md">
       <div className="max-w-5xl mx-auto flex items-center justify-between">
-        <h1 className="text-xl font-bold">My App</h1>
+        <Link to="/">
+          <h1 className="text-xl font-bold">My App</h1>
+        </Link>
 
         <nav className="flex gap-6">
           <NavLink
