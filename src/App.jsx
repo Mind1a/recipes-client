@@ -5,6 +5,8 @@ import Header from "./features/shared/components/Header";
 import RecipeDetails from "./pages/RecipeDetails";
 import CreateRecipe from "./pages/CreateRecipe";
 import EditRecipe from "./pages/EditRecipe";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <main className="max-w-5xl mx-auto p-6">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipes/:id" element={<RecipeDetails />} />
             <Route path="/recipes/:id/edit" element={<EditRecipe />} />
