@@ -1,10 +1,9 @@
-"use client";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
 
 import { registerSchema } from "../validation/registerSchema";
-import { registerUser } from "../api/authApi";
+import { useAuth } from "../context/useAuth";
 
 const RegisterForm = () => {
   const {
@@ -15,15 +14,13 @@ const RegisterForm = () => {
   } = useForm({
     resolver: zodResolver(registerSchema),
   });
+  const { register: registerWithApi } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
-      await registerUser(data);
-
-      console.log("User registered");
-
-      // TODO:
-      // redirect or show success
+      await registerWithApi(data);
+      navigate("/login", { replace: true });
     } catch (error) {
       setError("root", {
         message: error.message,
@@ -117,9 +114,9 @@ const RegisterForm = () => {
 
         <p className="text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <span className="text-blue-600 cursor-pointer hover:underline">
+          <Link to="/login" className="text-blue-600 hover:underline">
             Login
-          </span>
+          </Link>
         </p>
       </form>
     </div>

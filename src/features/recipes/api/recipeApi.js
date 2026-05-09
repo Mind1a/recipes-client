@@ -1,6 +1,7 @@
 export const createRecipe = async (recipeData) => {
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/recipes`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

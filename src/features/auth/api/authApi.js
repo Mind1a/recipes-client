@@ -1,24 +1,54 @@
-// src/features/auth/api/authApi.js
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const AUTH_BASE_URL = `${API_BASE_URL}/auth`;
 
-export const registerUser = async (data) => {
-  const response = await fetch("http://localhost:5000/api/auth/register", {
-    method: "POST",
+const fetchAuthJson = async (url, options = {}) => {
+  const response = await fetch(url, {
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(options.headers || {}),
     },
-    // credentials: "include", // 🔥 required for cookies
-    body: JSON.stringify({
-      username: data.username,
-      email: data.email.toLowerCase(), // normalize
-      password: data.password,
-    }),
+    ...options,
   });
 
-  const result = await response.json();
+  const contentType = response.headers.get("content-type") || "";
+  const rawBody = await response.text();
+
+  let result = {};
+  if (rawBody && contentType.includes("application/json")) {
+    result = JSON.parse(rawBody);
+  }
 
   if (!response.ok) {
-    throw new Error(result.message || "Something went wrong");
+    throw new Error(result.message || "Authentication request failed");
   }
 
   return result;
 };
+
+export const registerUser = async (data) =>
+  fetchAuthJson(`${AUTH_BASE_URL}/register`, {
+    method: "POST",
+    body: JSON.stringify({
+      username: data.username,
+      email: data.email.toLowerCase(),
+      password: data.password,
+    }),
+  });
+
+export const loginUser = async (data) =>
+  fetchAuthJson(`${AUTH_BASE_URL}/login`, {
+    method: "POST",
+    body: JSON.stringify({
+      email: data.email.toLowerCase(),
+      password: data.password,
+    }),
+  });
+
+export const getCurrentUser = async () => fetchAuthJson(`${AUTH_BASE_URL}/me`);
+
+export const logoutUser = async () =>
+  fetchAuthJson(`${AUTH_BASE_URL}/logout`, {
+    method: "POST",
+  });

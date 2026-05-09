@@ -7,6 +7,8 @@ import CreateRecipe from "./pages/CreateRecipe";
 import EditRecipe from "./pages/EditRecipe";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import ProtectedRoute from "./features/auth/components/ProtectedRoute";
+import PublicRoute from "./features/auth/components/PublicRoute";
 
 function App() {
   return (
@@ -17,12 +19,19 @@ function App() {
         <main className="max-w-5xl mx-auto p-6">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+
+            <Route element={<PublicRoute />}>
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+            </Route>
+
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipes/:id" element={<RecipeDetails />} />
-            <Route path="/recipes/:id/edit" element={<EditRecipe />} />
-            <Route path="/create" element={<CreateRecipe />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/recipes/:id/edit" element={<EditRecipe />} />
+              <Route path="/create" element={<CreateRecipe />} />
+            </Route>
           </Routes>
         </main>
       </div>

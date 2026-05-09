@@ -1,25 +1,32 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { loginSchema } from "../validation/loginSchema";
+import { useAuth } from "../context/useAuth";
 
 const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const onSubmit = async (data) => {
-    console.log("LOGIN DATA:", data);
-
     try {
-      // TODO: connect API
-      // await loginUser(data)
+      await login(data);
+      const nextPath = location.state?.from?.pathname || "/";
+      navigate(nextPath, { replace: true });
     } catch (error) {
-      console.error(error);
+      setError("root", {
+        message: error.message,
+      });
     }
   };
 
@@ -32,6 +39,12 @@ const LoginForm = () => {
         <h2 className="text-2xl font-semibold text-center text-gray-800">
           Welcome Back
         </h2>
+
+        {errors.root && (
+          <p className="text-red-500 text-sm text-center">
+            {errors.root.message}
+          </p>
+        )}
 
         {/* Email */}
         <div>
@@ -72,9 +85,9 @@ const LoginForm = () => {
 
         <p className="text-center text-sm text-gray-500">
           Don’t have an account?{" "}
-          <span className="text-blue-600 cursor-pointer hover:underline">
+          <Link to="/register" className="text-blue-600 hover:underline">
             Register
-          </span>
+          </Link>
         </p>
       </form>
     </div>

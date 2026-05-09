@@ -1,9 +1,17 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/context/useAuth";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const baseStyles = "transition-colors";
   const activeStyles = "text-yellow-400";
   const inactiveStyles = "hover:text-yellow-400";
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="bg-gray-900 text-white px-6 py-4 shadow-md">
@@ -45,27 +53,47 @@ const Header = () => {
 
         {/* Auth */}
         <div className="flex items-center gap-4">
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              `${baseStyles} ${
-                isActive ? activeStyles : "hover:text-yellow-400"
-              }`
-            }
-          >
-            Login
-          </NavLink>
+          {isAuthenticated ? (
+            <>
+              <span className="text-sm text-gray-200">
+                {user?.username || user?.email || "Signed in"}
+              </span>
 
-          <NavLink
-            to="/register"
-            className={({ isActive }) =>
-              `${
-                isActive ? "bg-yellow-500" : "bg-yellow-400 hover:bg-yellow-500"
-              } text-gray-900 px-4 py-1.5 rounded-lg font-medium transition`
-            }
-          >
-            Register
-          </NavLink>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-4 py-1.5 rounded-lg font-medium transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `${baseStyles} ${
+                    isActive ? activeStyles : "hover:text-yellow-400"
+                  }`
+                }
+              >
+                Login
+              </NavLink>
+
+              <NavLink
+                to="/register"
+                className={({ isActive }) =>
+                  `${
+                    isActive
+                      ? "bg-yellow-500"
+                      : "bg-yellow-400 hover:bg-yellow-500"
+                  } text-gray-900 px-4 py-1.5 rounded-lg font-medium transition`
+                }
+              >
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </header>
