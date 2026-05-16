@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast"; // 🆕
+import { likeRecipe, dislikeRecipe } from "../features/recipes/api/recipeApi";
 
 const RecipeDetails = () => {
   const { id } = useParams();
@@ -15,6 +16,12 @@ const RecipeDetails = () => {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -41,6 +48,10 @@ const RecipeDetails = () => {
         if (!res.ok) throw new Error(data.message);
 
         setRecipe(data.data);
+        setLikes(data.data.likes || 0);
+        setDislikes(data.data.dislikes || 0);
+        setIsLiked(data.data.isLiked || false);
+        setIsDisliked(data.data.isDisliked || false);
       } catch (error) {
         console.error(error);
         toast.error("Failed to load recipe");
@@ -144,6 +155,42 @@ const RecipeDetails = () => {
     }
   };
 
+  const handleLike = async () => {
+    try {
+      setLikeLoading(true);
+      const result = await likeRecipe(id);
+
+      setLikes(result.data.likes);
+      setDislikes(result.data.dislikes);
+      setIsLiked(result.data.isLiked);
+      setIsDisliked(result.data.isDisliked);
+
+      toast.success(result.message);
+    } catch (error) {
+      toast.error(error.message || "Failed to update like status");
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
+  const handleDislike = async () => {
+    try {
+      setLikeLoading(true);
+      const result = await dislikeRecipe(id);
+
+      setLikes(result.data.likes);
+      setDislikes(result.data.dislikes);
+      setIsLiked(result.data.isLiked);
+      setIsDisliked(result.data.isDisliked);
+
+      toast.success(result.message);
+    } catch (error) {
+      toast.error(error.message || "Failed to update dislike status");
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!recipe) return <p>Recipe not found</p>;
 
@@ -175,6 +222,33 @@ const RecipeDetails = () => {
       </p>
 
       <p className="text-gray-800 leading-7">{recipe.description}</p>
+
+      {/* Like/Dislike Section */}
+      <div className="flex gap-4 my-6 pb-6 border-b border-gray-300">
+        <button
+          onClick={handleLike}
+          disabled={likeLoading}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition ${
+            isLiked
+              ? "bg-red-100 text-red-600 hover:bg-red-200"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          } disabled:opacity-60 disabled:cursor-not-allowed`}
+        >
+          👍 Like ({likes})
+        </button>
+
+        <button
+          onClick={handleDislike}
+          disabled={likeLoading}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition ${
+            isDisliked
+              ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          } disabled:opacity-60 disabled:cursor-not-allowed`}
+        >
+          👎 Dislike ({dislikes})
+        </button>
+      </div>
 
       <section className="mt-10">
         <div className="rounded-2xl border border-amber-100 bg-linear-to-br from-amber-50 via-white to-orange-50 shadow-sm">

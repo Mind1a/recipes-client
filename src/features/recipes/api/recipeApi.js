@@ -37,3 +37,45 @@ export const createRecipe = async (recipeData) => {
 
   return data;
 };
+
+export const likeRecipe = async (recipeId) => {
+  const res = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/recipes/${recipeId}/like`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to like recipe");
+  }
+
+  return data;
+};
+
+export const dislikeRecipe = async (recipeId) => {
+  const res = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/recipes/${recipeId}/dislike`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to dislike recipe");
+  }
+
+  return data;
+};
